@@ -5,7 +5,7 @@ const CUI = {epoch:0,loading:false,error:'',catalog:[],people:null,query:'',peop
   ledger:null,ledgerPage:0,inbox:null,inboxPage:0,recipient:null,recipientResults:null,transferKind:'money',
   roles:null,teamSearch:null,teamTarget:null,staffData:null,staffSection:'overview',staffPage:0,staffQuery:'',
   carQuery:'',carSort:'price',roleEditing:0};
-const EXTRA_PAGES=['fleet','people','player','transfers','titles','team','staff','inbox','support'];
+const EXTRA_PAGES=['fleet','people','player','transfers','titles','team','staff','inbox','support','referrals'];
 const STAFF_NAMES={credit:'Выдать игровые ₽',debit:'Списать игровые ₽',ban:'Заблокировать',unban:'Разблокировать',
   vip:'Изменить VIP',grant_plate:'Выдать номер',grant_car:'Выдать машину',reset_daily:'Сбросить таймер бонуса'};
 const STAFF_RIGHTS={credit:'economy.credit',debit:'economy.debit',ban:'moderation.ban',unban:'moderation.ban',
@@ -37,13 +37,14 @@ async function loadCommunity(target=page){
   CUI.loading=true;CUI.error='';render();
   try{
     let action='state',data={};
-    if(target==='cars')action='catalog';
+  if(target==='cars')action='catalog';
     if(target==='people'){action='people';data={query:CUI.query,page:CUI.peoplePage};}
     if(target==='player'){action='player';data={user_id:CUI.playerId};}
     if(target==='transfers'){action='ledger';data={page:CUI.ledgerPage};}
     if(target==='inbox'){action='inbox';data={page:CUI.inboxPage};}
+    if(target==='referrals')action='state';
     if(target==='team')action='roles';
-    if(target==='staff'){action='staff';data={section:CUI.staffSection,page:CUI.staffPage,query:CUI.staffQuery};}
+  if(target==='staff'){action='staff';data={section:CUI.staffSection,page:CUI.staffPage,query:CUI.staffQuery};}
     const j=await request(action,data);
     if(epoch!==CUI.epoch||generation!==stateGeneration)return;
     commit(j);takeCommunity(j);
@@ -77,7 +78,7 @@ async function communityWrite(action,op,data={},after=null,retry=false){
     notify(e.uncertain?'Ответ потерялся. Нажми «Проверить операцию» — повторного списания не будет.':e.message,true);
   }finally{
     busy=false;render();setControlsBusy();
-    if(!pendingCommunity&&['team','staff','transfers','inbox'].includes(page))loadCommunity(page);
+  if(!pendingCommunity&&['team','staff','transfers','inbox','referrals'].includes(page))loadCommunity(page);
   }
 }
 function openPlayer(id){
@@ -95,6 +96,7 @@ renderProfile=function(){
   ${profileLink('people','Игроки','Найти коллекционера и посмотреть профиль','me',true)}
   ${profileLink('transfers','Передачи и история','Деньги, номера и машины','gift',true)}
   ${profileLink('titles','Титулы','Твой уровень и открытые звания','trophy',true)}
+  ${profileLink('referrals','Пригласи друзей',`${S.referral?.count||0} приглашённых · награды`,'gift',true)}
   ${profileLink('inbox','Уведомления',S.unread_notifications?`${S.unread_notifications} непрочитанных`:'Подарки и действия команды','quests',true)}
   ${S.is_admin?profileLink('admin','Панель владельца','Управление игрой и экономикой','shield',true):''}
   ${owner()?profileLink('team','Роли и команда','Создать роль, назначить права','settings',true):''}
@@ -200,10 +202,17 @@ async function previewGift(){
 function renderTitles(){
   const level=S.level||1;
   return `${heading('Титулы','Новый уровень — новый статус в коллекции.','ПРОГРЕСС',true)}
-  <div class="level-panel"><div class="row"><div><div class="eyebrow">ТВОЙ УРОВЕНЬ</div><strong>${level}</strong></div>${icon('trophy')}</div><h2>${escapeHTML(S.title||'Новичок')}</h2><div class="quest-progress"><i style="width:${(S.level_progress||0)*10}%"></i></div><p class="hint">${level>=100?'Максимальный уровень достигнут.':`${S.next_level_in||10} прокрутов до следующего уровня.`} Один номер в прокрутке — 1 очко опыта; 10 очков — уровень.</p></div>
-  <div class="titles-grid">${(S.titles||[]).map(t=>{const unlocked=level>=t.level;return `<article class="title-card ${unlocked?'unlocked':'locked'}">${icon(unlocked?'trophy':'shield')}<small>УРОВЕНЬ ${t.level}</small><h3>${escapeHTML(t.name)}</h3><button class="${S.title_id===t.id?'primary':'secondary'} full" data-action="title-select" data-title-id="${t.id}" ${!unlocked||S.title_id===t.id?'disabled':''}>${S.title_id===t.id?'Выбран':unlocked?'Надеть титул':'Пока закрыт'}</button></article>`;}).join('')}</div><p class="hint" style="margin-top:18px">Титулы косметические: не меняют шансы выпадения и не дают прав администратора.</p>`;
+  <div class="level-panel"><div class="row"><div><div class="eyebrow">ТВОЙ УРОВЕНЬ</div><strong>${level}</strong></div>${icon('trophy')}</div><h2 class="${S.title_id==='absolute'?'title-rgb':''}">${escapeHTML(S.title||'Новичок')}</h2><div class="quest-progress"><i style="width:${(S.level_progress||0)*10}%"></i></div><p class="hint">${level>=100000?'Максимальный уровень достигнут.':`${S.next_level_in||10} прокрутов до следующего уровня.`} Один номер в прокрутке — 1 очко опыта; 10 очков — уровень. Максимум — 100 000.</p></div>`;
 }
-function renderInbox(){const items=CUI.inbox?.items||[];return `${heading('Уведомления','','ТВОЯ КОЛЛЕКЦИЯ',true)}<div class="row"><p class="hint">Новые подарки и действия команды</p><button class="secondary" data-action="notifications-read" ${items.length?'':'disabled'}>Прочитать все</button></div>${communityStatus()}<div class="inbox-list">${items.map(n=>`<article class="inbox-item ${n.is_read?'':'unread'}"><div class="row"><h3>${escapeHTML(n.title)}</h3><span class="hint">${dateLabel(n.ts)}</span></div><p>${escapeHTML(n.message)}</p></article>`).join('')||'<div class="admin-placeholder">Пока ничего нового.</div>'}</div>${communityPager(CUI.inbox,'inbox')}`;}
+function renderReferrals(){
+  const r=S.referral||{count:0,claimed:[],rewards:[],link:''};
+  return `${heading('Пригласи друзей','Играй вместе и открывай награды за приглашённых.','РЕФЕРАЛЬНАЯ ПРОГРАММА',true)}
+  <div class="info-card"><div class="eyebrow">ТВОЯ ССЫЛКА</div><p class="hint">Отправь ссылку другу. Приглашение засчитывается, когда новый игрок впервые откроет приложение по Telegram deep link.</p>
+  <input class="input" readonly value="${escapeHTML(r.link||'Ссылка появится после настройки BOT_USERNAME')}" id="referral-link"><button class="primary full" style="margin-top:12px" data-action="copy-referral" ${r.link?'':'disabled'}>Скопировать ссылку</button>
+  <p class="hint">Приглашено: <b>${r.count||0}</b> · Бесплатных прокруток: <b>${S.free_spins||0}</b></p></div>
+  <div class="titles-grid">${(r.rewards||[]).map(x=>{const claimed=(r.claimed||[]).includes(x.count),ready=(r.count||0)>=x.count;return `<article class="title-card ${ready?'unlocked':'locked'}"><small>${x.count} ПРИГЛАШЁННЫХ</small><h3>${escapeHTML(x.label)}</h3><button class="${claimed?'secondary':'primary'} full" data-action="referral-claim" data-count="${x.count}" ${!ready||claimed?'disabled':''}>${claimed?'Получено':ready?'Забрать':x.count+' приглашённых'}</button></article>`;}).join('')}</div>
+  <p class="hint">Один аккаунт может привязаться только к одному пригласившему. Самоприглашения не засчитываются; каждую награду можно получить один раз.</p>`;
+}
 function renderSupport(){return `${heading('Поддержка и идеи','Напиши владельцу — по делу или с новой идеей.','ОБРАТНАЯ СВЯЗЬ',true)}
   <div class="support-grid"><article class="support-card">${icon('info')}<h2>Нужна помощь?</h2><p>Ошибка, вопрос об игре или проблема с доступом.</p><button class="secondary" data-action="owner-chat" data-kind="support">Написать в поддержку</button></article><article class="support-card">${icon('bolt')}<h2>Есть идея?</h2><p>Новая механика, машина или улучшение интерфейса.</p><button class="primary" data-action="owner-chat" data-kind="suggest">Предложить улучшение</button></article></div>
   <div class="info-card section-gap"><label for="support-message">СООБЩЕНИЕ — НЕОБЯЗАТЕЛЬНО</label><textarea class="input" id="support-message" rows="5" maxlength="1200" placeholder="Что произошло или что добавить?"></textarea><p class="hint">Кнопка откроет чат @${escapeHTML(S.support_handle||DONATE_HANDLE)} с подготовленным текстом. Отправку подтверждаешь ты в Telegram. Не указывай пароли и платёжные реквизиты.</p></div>`;}
@@ -281,7 +290,7 @@ updateHeader=function(){previousHeader();if(!S)return;
   let b=$('#community-inbox');if(!b){b=document.createElement('button');b.id='community-inbox';b.className='icon-btn inbox-button';b.dataset.page='inbox';b.setAttribute('aria-label','Уведомления');b.innerHTML=icon('quests');$('#sound-button').before(b);}
   b.dataset.unread=String(S.unread_notifications||0);
   const admin=$('#admin-entry');if(admin){admin.hidden=!S.staff?.name&&!S.is_admin;admin.dataset.page=S.is_admin?'admin':'staff';}
-  $$('[data-page].nav-item').forEach(n=>{const active=n.dataset.page===page||(page==='fleet'&&n.dataset.page==='garage')||(['player','transfers'].includes(page)&&n.dataset.page==='people')||(['titles','team','staff','support','inbox'].includes(page)&&n.dataset.page==='me');if(active)n.classList.add('active');});
+  $$('[data-page].nav-item').forEach(n=>{const active=n.dataset.page===page||(page==='fleet'&&n.dataset.page==='garage')||(['player','transfers'].includes(page)&&n.dataset.page==='people')||(['titles','team','staff','support','inbox','referrals'].includes(page)&&n.dataset.page==='me');if(active)n.classList.add('active');});
 };
 const previousGarage=renderGarage;
 renderGarage=function(){return pageTools()+previousGarage();};
@@ -319,6 +328,8 @@ handleAction=async function(button){
     case 'transfer-recipient':CUI.recipient=CUI.recipientResults?.items.find(p=>p.user_id===id)||null;render();return;
     case 'recipient-clear':CUI.recipient=null;CUI.recipientResults=null;render();return;
     case 'title-select':return communityWrite('community_action','set_title',{title_id:button.dataset.titleId});
+    case 'copy-referral':try{await navigator.clipboard.writeText(S.referral?.link||'');notify('Ссылка скопирована.');}catch{notify('Не удалось скопировать ссылку.',true);}return;
+    case 'referral-claim':return communityWrite('community_action','claim_referral',{milestone:Number(button.dataset.count)});
     case 'notifications-read':return communityWrite('community_action','mark_read',{until_id:Math.max(0,...(CUI.inbox?.items||[]).map(v=>v.id))});
     case 'owner-chat':return openOwnerChat(button.dataset.kind);
     case 'role-new':return editRole();
@@ -380,12 +391,12 @@ let carSearchTimer;
 document.addEventListener('input',event=>{if(event.target.id==='car-search'){CUI.carQuery=event.target.value;clearTimeout(carSearchTimer);carSearchTimer=setTimeout(()=>{if(page==='cars'){const start=event.target.selectionStart;render();const el=$('#car-search');el?.focus();el?.setSelectionRange(start,start);}},300);}});
 /* Demo is clearly labelled and has no write path to a production account. */
 function demoProfile(){
-  const d=demoDB||S,level=Math.min(100,Math.floor(d.spins/10)+1);
+  const d=demoDB||S,level=Math.min(100000,Math.floor(d.spins/10)+1);
   const plates=d.garage.reduce((a,g)=>a+g.price,0),cars=(d.cars||[]).reduce((a,g)=>a+g.value,0);
   const titles=d.titles||DEMO_TITLES,unlocked=titles.filter(t=>t.level<=level),t=unlocked.find(t=>t.id===d.title_id)||unlocked.at(-1);
   return {user_id:d.user_id||1001,name:'Коллекционер',handle:'',balance:d.balance,spins:d.spins,vip:d.vip,plate_count:d.garage.length,market_count:0,market_worth:0,plate_worth:plates,car_count:(d.cars||[]).length,car_worth:cars,total_worth:d.balance+plates+cars,staff_title:'',is_owner:false,level,title:t.name,title_id:t.id,showcase:(d.cars||[]).find(v=>v.showcased)||null};
 }
-const DEMO_TITLES=[{id:'rookie',level:1,name:'Новичок'},{id:'driver',level:5,name:'Водитель'},{id:'collector',level:10,name:'Коллекционер'},{id:'connoisseur',level:20,name:'Знаток номеров'},{id:'magnate',level:35,name:'Гаражный магнат'},{id:'fleet',level:50,name:'Владелец автопарка'},{id:'hunter',level:75,name:'Охотник за легендами'},{id:'legend',level:100,name:'Легенда дорог'}];
+const DEMO_TITLES=[{id:'rookie',level:1,name:'Новичок'},{id:'driver',level:5,name:'Водитель'},{id:'collector',level:10,name:'Коллекционер'},{id:'connoisseur',level:20,name:'Знаток номеров'},{id:'magnate',level:35,name:'Гаражный магнат'},{id:'fleet',level:50,name:'Владелец автопарка'},{id:'hunter',level:75,name:'Охотник за легендами'},{id:'legend',level:100,name:'Легенда дорог'},{id:'veteran',level:250,name:'Ветеран трассы'},{id:'elite',level:500,name:'Элита дорог'},{id:'millionaire',level:1000,name:'Мастер коллекции'},{id:'grandmaster',level:5000,name:'Гранд-мастер'},{id:'immortal',level:10000,name:'Бессмертный коллекционер'},{id:'myth',level:50000,name:'Миф Номерка'},{id:'absolute',level:100000,name:'Абсолютная легенда'}];
 const originalDemoRequest=demoRequest;
 demoRequest=async function(action,data){
   if(!demoDB)seedDemo();
@@ -414,4 +425,3 @@ demoRequest=async function(action,data){
   d.public_profile=demoProfile();Object.assign(d,{level:d.public_profile.level,title:d.public_profile.title,title_id:d.public_profile.title_id,level_progress:d.spins%10,next_level_in:10-d.spins%10});
   return JSON.parse(JSON.stringify({...d,...extra,public_profile:d.public_profile,staff:d.staff,version:'6.0'}));
 };
-
