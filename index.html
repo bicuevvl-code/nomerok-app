@@ -231,7 +231,7 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const tg = window.Telegram?.WebApp || null;
 const params = new URLSearchParams(location.search);
 // Public routing configuration. Never place a bot token in this file.
-const DEFAULT_API_URL = 'https://mazda-pork-untitled-positioning.trycloudflare.com';
+const DEFAULT_API_URL = 'https://supports-minerals-offering-buzz.trycloudflare.com';
 const DEMO = params.get('demo') === '1';
 const user = tg?.initDataUnsafe?.user || {first_name: DEMO ? 'Коллекционер' : 'Игрок'};
 const RARITIES = ['Обычный','Редкий','Эпический','Легендарный','Мифический'];
@@ -1219,21 +1219,25 @@ async function demoRequest(action,data){
   return JSON.parse(JSON.stringify({...d,...extra}));
 }
 async function boot(){
-  $('#view').innerHTML='<div class="loading-state"><div class="loader"></div><h2>Открываем гараж</h2><p>Загружаем твою коллекцию…</p></div>';
+  const root=$('#view');
+  root.innerHTML='<div class="loading-state"><div class="loader"></div><h2>Открываем гараж</h2><p>Загружаем твою коллекцию…</p></div>';
+  const watchdog=setTimeout(()=>{if(!S)root.innerHTML=`<div class="empty-state" style="margin-top:40px">${icon('info')}<h3>Сервер не отвечает</h3><p>Проверь API_URL, доступность VPS и HTTPS-адрес. Загрузка не будет продолжаться бесконечно.</p><div class="stack"><button class="primary" data-action="retry">${icon('refresh')}Повторить</button><button class="secondary" data-action="demo">Посмотреть демо</button></div></div>`;},12000);
   try{commit(await request('state'));if(!DEMO&&Number(String(S.version||'0').split('.')[0])<7)throw new RequestError('Сайт обновлён, но сервер ещё старой версии. Обнови все пять файлов backend и перезапусти бота. Данные игроков не сбрасывай.');spinCount=pendingSpin?.n||1;
 if(S.last_spin&&!pendingSpin){lastResults=S.last_spin.results||[];lastBest=lastResults.reduce((a,b)=>!a||rank(b)>rank(a)||rank(b)===rank(a)&&b.price>a.price?b:a,null);lastBatchAt=S.last_spin.ts;HISTORY=[S.last_spin];}
 page=pendingSpin?'spin':(['spin','garage','cars','market','quests','me','vip','top','admin','history','album','fleet','people','player','transfers','titles','team','staff','inbox','support','referrals','hub','exchanges','exchange','contracts','sets','race','wishes','customize','car-market'].includes(location.hash.slice(1))?location.hash.slice(1):'spin');if(page==='admin'&&!S.is_admin)page='me';history.replaceState({page,depth:0},'',`#${page}`);render();if(['market','top','history'].includes(page))loadSection(page);if(page==='admin')loadAdmin();if(page==='cars'||EXTRA_PAGES.includes(page))loadCommunity(page);}
-  catch(e){$('#view').innerHTML=`<div class="empty-state" style="margin-top:40px">${icon('info')}<h3>Не удалось открыть коллекцию</h3><p>${escapeHTML(e.message)}</p><div class="stack"><button class="primary" data-action="retry">${icon('refresh')}Попробовать ещё раз</button><button class="secondary" data-action="demo">Посмотреть демо</button></div></div>`;}
+   catch(e){root.innerHTML=`<div class="empty-state" style="margin-top:40px">${icon('info')}<h3>Не удалось открыть коллекцию</h3><p>${escapeHTML(e.message)}</p><div class="stack"><button class="primary" data-action="retry">${icon('refresh')}Попробовать ещё раз</button><button class="secondary" data-action="demo">Посмотреть демо</button></div></div>`;}
+   finally{clearTimeout(watchdog);}
 }
 try{if(tg){tg.ready();tg.expand();tg.setHeaderColor?.('#0b1014');tg.setBackgroundColor?.('#0b1014');tg.BackButton?.onClick(goBack);tg.SettingsButton?.onClick(()=>{if(!spinning)openSettings();});tg.SettingsButton?.show();}}catch{}
 applyPrefs();$('#demo-banner').hidden=!DEMO;
 window.Nomerok={preview,version:'7.0',get audioState(){return audio.ctx?.state||'not-started';},get activeSounds(){return audio.sources.size;}};
 </script>
-<script src="assets/community.js?v=7.0"></script>
-<script src="assets/world-content.js?v=7.0"></script>
-<script src="assets/world.js?v=7.0"></script>
+<script src="assets/community.js?v=8.0"></script>
+<script src="assets/world-content.js?v=8.0"></script>
+<script src="assets/world.js?v=8.0"></script>
 </body>
 </html>
+
 
 
 
