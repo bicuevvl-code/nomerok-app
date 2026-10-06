@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Номерок Premium</title>
+  <desc id="desc">Эмблема коллекционера номерных знаков</desc>
+  <defs>
+    <radialGradient id="background" cx="50%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#26354b"/>
+      <stop offset=".58" stop-color="#101a2c"/>
+      <stop offset="1" stop-color="#050914"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3a3"/>
+      <stop offset=".28" stop-color="#facc15"/>
+      <stop offset=".68" stop-color="#d99b0b"/>
+      <stop offset="1" stop-color="#fff0a0"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".45" stop-color="#dbe5ef"/>
+      <stop offset="1" stop-color="#8da0b5"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="drop" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="15" stdDeviation="13" flood-color="#000" flood-opacity=".55"/>
+    </filter>
+  </defs>
+
+  <circle cx="256" cy="256" r="252" fill="#030712"/>
+  <circle cx="256" cy="256" r="238" fill="url(#background)" stroke="url(#gold)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="218" fill="none" stroke="#facc15" stroke-width="2" opacity=".28" stroke-dasharray="3 15"/>
+
+  <!-- four small collector marks -->
+  <g fill="url(#gold)" opacity=".9">
+    <path d="M256 38l7 16 17 2-13 11 4 17-15-9-15 9 4-17-13-11 17-2z"/>
+    <path d="M474 256l-16 7-2 17-11-13-17 4 9-15-9-15 17 4 11-13 2 17z"/>
+    <path d="M256 474l-7-16-17-2 13-11-4-17 15 9 15-9-4 17 13 11-17 2z"/>
+    <path d="M38 256l16-7 2-17 11 13 17-4-9 15 9 15-17-4-11 13-2-17z"/>
+  </g>
+
+  <!-- central shield -->
+  <path d="M256 83l128 43v105c0 91-55 143-128 180-73-37-128-89-128-180V126z" fill="#08111f" stroke="url(#gold)" stroke-width="8" filter="url(#drop)"/>
+  <path d="M256 106l103 35v89c0 73-41 114-103 148-62-34-103-75-103-148v-89z" fill="none" stroke="#facc15" stroke-width="2" opacity=".35"/>
+
+  <!-- plate -->
+  <g transform="rotate(-4 256 250)" filter="url(#drop)">
+    <rect x="116" y="181" width="280" height="139" rx="20" fill="#0b1320" stroke="#facc15" stroke-width="6"/>
+    <rect x="128" y="193" width="256" height="115" rx="12" fill="url(#metal)"/>
+    <path d="M145 207h226" stroke="#fff" stroke-width="4" opacity=".5"/>
+    <text x="248" y="274" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="900" letter-spacing="-3" fill="#0b1422">Н777</text>
+    <rect x="333" y="202" width="42" height="97" rx="3" fill="#f8fafc"/>
+    <text x="354" y="247" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800" fill="#0b1422">77</text>
+    <path d="M340 258h28" stroke="#0b1422" stroke-width="2"/>
+    <text x="354" y="286" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="800" fill="#0b1422">RUS</text>
+  </g>
+
+  <!-- rarity ribbon -->
+  <path d="M149 335h214l-14 42H163z" fill="url(#gold)" stroke="#6b4b08" stroke-width="3"/>
+  <text x="256" y="365" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="900" letter-spacing="4" fill="#172033">КОЛЛЕКЦИЯ</text>
+
+  <g filter="url(#glow)" fill="#fff4a8">
+    <circle cx="106" cy="151" r="3"/><circle cx="414" cy="155" r="4"/><circle cx="98" cy="371" r="3"/><circle cx="418" cy="371" r="3"/>
+  </g>
+</svg>

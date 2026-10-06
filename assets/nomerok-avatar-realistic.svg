@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Номерок — номерной знак</title>
+  <desc id="desc">Строгий логотип Номерка с реалистичным российским номерным знаком</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#202a36"/>
+      <stop offset=".7" stop-color="#0b1017"/>
+      <stop offset="1" stop-color="#030507"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f7fa"/>
+      <stop offset=".45" stop-color="#aab5c0"/>
+      <stop offset="1" stop-color="#4b5661"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".48" stop-color="#e6ebef"/>
+      <stop offset="1" stop-color="#b7c1ca"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-40%" width="160%" height="190%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity=".68"/>
+    </filter>
+  </defs>
+
+  <circle cx="256" cy="256" r="250" fill="#020406"/>
+  <circle cx="256" cy="256" r="232" fill="url(#bg)" stroke="#303b47" stroke-width="3"/>
+  <circle cx="256" cy="256" r="216" fill="none" stroke="#b99737" stroke-width="2" opacity=".55"/>
+
+  <!-- restrained central plate -->
+  <g filter="url(#shadow)">
+    <rect x="54" y="161" width="404" height="190" rx="14" fill="#090d12" stroke="#687581" stroke-width="4"/>
+    <rect x="66" y="173" width="380" height="166" rx="7" fill="url(#edge)"/>
+    <rect x="72" y="179" width="368" height="154" rx="4" fill="url(#plate)" stroke="#596672" stroke-width="2"/>
+    <path d="M82 188h348" stroke="#fff" stroke-width="3" opacity=".7"/>
+
+    <!-- standard Russian plate proportions: Н777КК 77 -->
+    <text x="265" y="286" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="105" font-weight="800" letter-spacing="-5" fill="#151b21">Н777КК</text>
+    <rect x="361" y="190" width="67" height="132" fill="#f7f9fa" stroke="#1c252d" stroke-width="2"/>
+    <text x="394.5" y="253" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" fill="#172029">77</text>
+    <path d="M373 266h43" stroke="#172029" stroke-width="3"/>
+    <text x="394.5" y="301" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#172029">RUS</text>
+    <circle cx="81" cy="188" r="3" fill="#65727d"/>
+    <circle cx="431" cy="324" r="3" fill="#65727d"/>
+  </g>
+
+  <!-- small, non-cartoon wordmark -->
+  <text x="256" y="405" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="700" letter-spacing="10" fill="#d1aa42">НОМЕРОК</text>
+  <path d="M160 423h192" stroke="#d1aa42" stroke-width="2" opacity=".65"/>
+</svg>
