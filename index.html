@@ -231,7 +231,7 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const tg = window.Telegram?.WebApp || null;
 const params = new URLSearchParams(location.search);
 // Public routing configuration. Never place a bot token in this file.
-const DEFAULT_API_URL = 'https://gmbh-two-contracts-approximately.trycloudflare.com';
+const DEFAULT_API_URL = 'https://bot.nomerok.space';
 const DEMO = params.get('demo') === '1';
 const user = tg?.initDataUnsafe?.user || {first_name: DEMO ? 'Коллекционер' : 'Игрок'};
 const RARITIES = ['Обычный','Редкий','Эпический','Легендарный','Мифический'];
